@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,16 +17,28 @@ namespace sys
 class BatteryBrownoutDetector
 {
   public:
-    BatteryBrownoutDetector(sys::Service *service, hal::battery::AbstractBatteryCharger &charger);
+    struct Thresholds
+    {
+        units::Voltage shutdown;
+        std::uint8_t measurementMaxCount;
+    };
+
+    using BrownoutCallback = std::function<void()>;
+
+    BatteryBrownoutDetector(sys::Service *service,
+                            hal::battery::AbstractBatteryCharger &charger,
+                            Thresholds voltage,
+                            BrownoutCallback messageCallback);
     void startDetection();
+    bool isBrownout();
 
   private:
-    void checkBrownout();
-
-    sys::Service *parentService;
+    void check();
     hal::battery::AbstractBatteryCharger &charger;
 
     bool detectionOngoing     = false;
     unsigned measurementCount = 0;
+    Thresholds voltage;
+    BrownoutCallback sendMessage;
     sys::TimerHandle measurementTick;
 };
