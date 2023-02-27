@@ -47,11 +47,12 @@ enum class MessageType
     APMAction,          ///< Used to send an action request to application manager.
     APMFinish,          ///< Used to finish the last occurrence of the requesting application.
     APMCheckAppRunning, ///< check if application is running in application manager
-    APMSwitch,          ///< request to switch to given application, optionally also to specified window
-    APMSwitchPrevApp,   ///< Request to switch to previous application.
-    APMConfirmSwitch,   ///< Used when application confirms that it is loosing focus and also when application confirms
-                        ///< that is has gained focus
-    APMConfirmClose,    ///< Sent by application to confirm completion of the close procedure
+    APMCheckAppIsPrevious,
+    APMSwitch,        ///< request to switch to given application, optionally also to specified window
+    APMSwitchPrevApp, ///< Request to switch to previous application.
+    APMConfirmSwitch, ///< Used when application confirms that it is loosing focus and also when application confirms
+                      ///< that is has gained focus
+    APMConfirmClose,  ///< Sent by application to confirm completion of the close procedure
     APMConfirmWindowSwitch, ///<
     APMFinalizingClose,
     APMRegister,       ///< when application finishes initHandler it is sending this messag to inform whether init was

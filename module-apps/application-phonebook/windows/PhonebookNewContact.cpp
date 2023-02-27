@@ -8,6 +8,8 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 
 #include <Dialog.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 
@@ -120,6 +122,25 @@ namespace gui
 
     auto PhonebookNewContact::onInput(const InputEvent &inputEvent) -> bool
     {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
+            constexpr std::string_view calllogAppName = "ApplicationCallLog";
+
+            auto const response =
+                application->bus.sendUnicastSync(std::make_shared<app::manager::GetPreviousApplicationName>(
+                                                     application->GetName(), calllogAppName.data()),
+                                                 service::name::appmgr,
+                                                 100);
+            if (response.first != sys::ReturnCodes::Success) {
+                LOG_ERROR("unable to check previous application name - timeout occured");
+                return false;
+            }
+
+            if (static_cast<app::manager::GetPreviousApplicationNameResponse *>(response.second.get())->result_) {
+                return app::manager::Controller::switchBack(
+                    application, std::make_unique<app::manager::SwitchBackRequest>(calllogAppName.data()));
+            }
+        }
+
         auto ret = AppWindow::onInput(inputEvent);
 
         setSaveButtonVisible(!newContactModel->emptyData());

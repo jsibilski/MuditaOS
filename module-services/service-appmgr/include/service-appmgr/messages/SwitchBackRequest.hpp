@@ -21,4 +21,21 @@ namespace app::manager
         [[nodiscard]] auto getData() noexcept -> std::unique_ptr<gui::SwitchData> &;
         bool dontSwitchBackWhenRequestedAppNameDoesntMatch;
     };
+
+    struct GetPreviousApplicationName : BaseMessage
+    {
+        GetPreviousApplicationName(ApplicationName const &sender, ApplicationName const &appNameToCheck)
+            : BaseMessage(MessageType::APMCheckAppIsPrevious, sender), appNameToCheck_{appNameToCheck}
+        {}
+
+        ApplicationName appNameToCheck_;
+    };
+
+    struct GetPreviousApplicationNameResponse : sys::ResponseMessage
+    {
+        GetPreviousApplicationNameResponse(bool response) : result_{response}
+        {}
+
+        bool result_;
+    };
 } // namespace app::manager

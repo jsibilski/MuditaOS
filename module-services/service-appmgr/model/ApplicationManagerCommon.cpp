@@ -240,6 +240,16 @@ namespace app::manager
             handleInitApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(GetPreviousApplicationName), [this](sys::Message *request) {
+            auto msg = static_cast<GetPreviousApplicationName *>(request);
+            try {
+                return handleGetPreviousApplicationName(msg);
+            }
+            catch (std::exception const &exc) {
+                LOG_WARN("%s", exc.what());
+                return sys::msgNotHandled();
+            }
+        });
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
@@ -439,6 +449,17 @@ namespace app::manager
             setState(State::AwaitingLostFocusConfirmation);
             app::ApplicationCommon::messageApplicationLostFocus(this, app.name());
         }
+    }
+
+    auto ApplicationManagerCommon::handleGetPreviousApplicationName(GetPreviousApplicationName const *request)
+        -> std::shared_ptr<sys::Message>
+    {
+        if (stack.size() < 2) {
+            throw std::logic_error("bad usage: no previous application");
+        }
+
+        auto &previousApp = *(stack.end() - 2);
+        return std::make_shared<GetPreviousApplicationNameResponse>(previousApp.appName == request->appNameToCheck_);
     }
 
     void ApplicationManagerCommon::handleActionRequest(ActionRequest *actionMsg)

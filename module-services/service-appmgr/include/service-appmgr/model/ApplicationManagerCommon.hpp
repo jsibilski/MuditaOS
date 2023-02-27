@@ -104,6 +104,8 @@ namespace app::manager
         auto checkOnBoarding() -> bool;
         virtual void registerMessageHandlers();
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
+        auto handleGetPreviousApplicationName(GetPreviousApplicationName const *request)
+            -> std::shared_ptr<sys::Message>;
         virtual void handleStart(StartAllowedMessage *msg);
         virtual auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         virtual auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
