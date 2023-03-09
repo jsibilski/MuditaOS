@@ -123,7 +123,7 @@ void sevm::battery::BatteryController::handleNotification(Events evt)
 void sevm::battery::BatteryController::poll()
 {
     update();
-    brownoutDetector.isBrownout();
+    brownoutDetector.check();
 }
 void sevm::battery::BatteryController::printCurrentState()
 {

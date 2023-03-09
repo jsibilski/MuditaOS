@@ -30,14 +30,13 @@ class BatteryBrownoutDetector
                             Thresholds voltage,
                             BrownoutCallback messageCallback);
     void startDetection();
-    bool isBrownout();
+    void check();
 
   private:
-    void check();
     hal::battery::AbstractBatteryCharger &charger;
 
-    bool detectionOngoing     = false;
-    unsigned measurementCount = 0;
+    bool eventDetectionOngoing        = false;
+    unsigned measurementBrownoutCount = 0;
     Thresholds voltage;
     BrownoutCallback sendMessage;
     sys::TimerHandle measurementTick;

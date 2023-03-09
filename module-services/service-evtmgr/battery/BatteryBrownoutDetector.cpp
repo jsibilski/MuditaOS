@@ -24,37 +24,34 @@ BatteryBrownoutDetector::BatteryBrownoutDetector(sys::Service *service,
 
 void BatteryBrownoutDetector::startDetection()
 {
-    if (detectionOngoing) {
+    if (eventDetectionOngoing) {
         return;
     }
-    LOG_DEBUG("Battery brownout detection window start");
-    detectionOngoing = true;
-    measurementCount = 0;
+    LOG_INFO("Battery brownout detection window start");
+    eventDetectionOngoing    = true;
+    measurementBrownoutCount = 0;
     check();
-}
-
-bool BatteryBrownoutDetector::isBrownout()
-{
-    if (charger.getBatteryVoltage() < voltage.shutdown) {
-        LOG_DEBUG("Battery brownout detected");
-        sendMessage();
-        return true;
-    }
-    return false;
 }
 
 void BatteryBrownoutDetector::check()
 {
-    if (isBrownout()) {
-        return;
-    }
-
-    measurementCount++;
-    if (measurementCount <= voltage.measurementMaxCount) {
-        measurementTick.start();
+    if (charger.getBatteryVoltage() < voltage.shutdown) {
+        measurementBrownoutCount++;
+        if (measurementBrownoutCount < voltage.measurementMaxCount) {
+            measurementTick.start();
+        }
+        else {
+            sendMessage();
+            eventDetectionOngoing = false;
+            LOG_INFO("Battery brownout detected");
+        }
     }
     else {
-        LOG_DEBUG("Battery brownout detection window finish with negative result");
-        detectionOngoing = false;
+        if (measurementBrownoutCount > 0) {
+            LOG_INFO("Battery brownout detection window finish with negative result");
+        }
+        // If the voltage level is correct reset counter and event flag
+        measurementBrownoutCount = 0;
+        eventDetectionOngoing    = false;
     }
 }
